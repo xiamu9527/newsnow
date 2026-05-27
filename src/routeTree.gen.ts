@@ -9,13 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SummaryRouteImport } from './routes/summary'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SummaryIdRouteImport } from './routes/summary.$id'
 import { Route as CColumnRouteImport } from './routes/c.$column'
 
+const SummaryRoute = SummaryRouteImport.update({
+  id: '/summary',
+  path: '/summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SummaryIdRoute = SummaryIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => SummaryRoute,
 } as any)
 const CColumnRoute = CColumnRouteImport.update({
   id: '/c/$column',
@@ -25,38 +37,59 @@ const CColumnRoute = CColumnRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/summary': typeof SummaryRouteWithChildren
   '/c/$column': typeof CColumnRoute
+  '/summary/$id': typeof SummaryIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/summary': typeof SummaryRouteWithChildren
   '/c/$column': typeof CColumnRoute
+  '/summary/$id': typeof SummaryIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/summary': typeof SummaryRouteWithChildren
   '/c/$column': typeof CColumnRoute
+  '/summary/$id': typeof SummaryIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/c/$column'
+  fullPaths: '/' | '/summary' | '/c/$column' | '/summary/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/c/$column'
-  id: '__root__' | '/' | '/c/$column'
+  to: '/' | '/summary' | '/c/$column' | '/summary/$id'
+  id: '__root__' | '/' | '/summary' | '/c/$column' | '/summary/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SummaryRoute: typeof SummaryRouteWithChildren
   CColumnRoute: typeof CColumnRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/summary': {
+      id: '/summary'
+      path: '/summary'
+      fullPath: '/summary'
+      preLoaderRoute: typeof SummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/summary/$id': {
+      id: '/summary/$id'
+      path: '/$id'
+      fullPath: '/summary/$id'
+      preLoaderRoute: typeof SummaryIdRouteImport
+      parentRoute: typeof SummaryRoute
     }
     '/c/$column': {
       id: '/c/$column'
@@ -68,8 +101,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface SummaryRouteChildren {
+  SummaryIdRoute: typeof SummaryIdRoute
+}
+
+const SummaryRouteChildren: SummaryRouteChildren = {
+  SummaryIdRoute: SummaryIdRoute,
+}
+
+const SummaryRouteWithChildren =
+  SummaryRoute._addFileChildren(SummaryRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SummaryRoute: SummaryRouteWithChildren,
   CColumnRoute: CColumnRoute,
 }
 export const routeTree = rootRouteImport

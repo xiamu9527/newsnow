@@ -21,6 +21,15 @@ export function NavBar() {
       >
         更多
       </button>
+      <Link
+        to="/summary"
+        className={$(
+          "px-2 hover:(bg-primary/10 rounded-md) cursor-pointer transition-all",
+          currentId === "summary" ? "color-primary font-bold" : "op-70 dark:op-90",
+        )}
+      >
+        AI 摘要
+      </Link>
       {fixedColumnIds.map(columnId => (
         <Link
           key={columnId}
